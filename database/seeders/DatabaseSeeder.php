@@ -26,8 +26,8 @@ class DatabaseSeeder extends Seeder
             'is_admin' => true,
         ]);
 
-        User::factory(100)->create(); // Hapus spasi berlebih
-        Todo::factory(100)->create([
+        User::factory(20)->create(); // Hapus spasi berlebih
+        Todo::factory(1)->create([
             'user_id' => User::inRandomOrder()->first()->id,
         ]);
     }

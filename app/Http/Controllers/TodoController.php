@@ -10,11 +10,8 @@ class TodoController extends Controller
 {  
     public function index()  
     {  
-        // Ambil hanya todos milik user yang sedang login
-        // $todos = Todo::all();  
-        $todos = Todo::all(); 
-        dd($todos);  
-        return view('todo.index');  
+        $todos = Todo::all();
+        return view('todo.index', compact('todos'));
     }  
 
     public function create()  
@@ -26,4 +23,20 @@ class TodoController extends Controller
     {  
         return view('todo.edit');  
     }  
+
+    public function store(Request $request)
+{
+    $request->validate([
+        'title' => 'required'
+    ]);
+
+    Todo::create([
+        'title' => $request->title,
+        'user_id' => Auth::id(), 
+        'is_done' => false,      
+    ]);
+
+    return redirect()->route('todo.index')->with('success', 'Todo created successfully!');
+    }
+
 }
