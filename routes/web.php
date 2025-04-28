@@ -22,8 +22,23 @@ Route::middleware('auth')->group(function () {
     // Todo routes (menggunakan resource kecuali show)
     Route::resource('todo', TodoController::class)->except(['show']);
 
-    // User route (untuk read & search user)
+    // ✅ Route eksplisit untuk Edit & Update Todo
+    Route::get('/todo/{id}/edit', [TodoController::class, 'edit'])->name('todo.edit');
+    Route::put('/todo/{id}', [TodoController::class, 'update'])->name('todo.update');
+
+    // ✅ Complete & Incomplete Todo
+    Route::patch('/todo/{id}/complete', [TodoController::class, 'markComplete'])->name('todo.complete');
+    Route::patch('/todo/{id}/incomplete', [TodoController::class, 'markIncomplete'])->name('todo.incomplete');
+
+    // ✅ DELETE TODO
+    Route::delete('/todo/{id}', [TodoController::class, 'destroy'])->name('todo.destroy');
+    Route::delete('/todo/delete/completed', [TodoController::class, 'destroyCompleted'])->name('todo.destroyCompleted');
+
+    // ✅ User Routes (lengkap)
     Route::get('/user', [UserController::class, 'index'])->name('user.index');
+    Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.destroy');
+    Route::patch('/user/{user}/make-admin', [UserController::class, 'makeAdmin'])->name('user.makeAdmin');
+    Route::patch('/user/{user}/remove-admin', [UserController::class, 'removeAdmin'])->name('user.removeAdmin');
 });
 
 require __DIR__.'/auth.php';
