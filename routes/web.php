@@ -14,12 +14,12 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    // Profile routes
+    // ✅ Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Todo routes (menggunakan resource kecuali show)
+    // ✅ Todo routes (menggunakan resource kecuali show)
     Route::resource('todo', TodoController::class)->except(['show']);
 
     // ✅ Route eksplisit untuk Edit & Update Todo
@@ -34,11 +34,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/todo/{id}', [TodoController::class, 'destroy'])->name('todo.destroy');
     Route::delete('/todo/delete/completed', [TodoController::class, 'destroyCompleted'])->name('todo.destroyCompleted');
 
-    // ✅ User Routes (lengkap)
-    Route::get('/user', [UserController::class, 'index'])->name('user.index');
-    Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.destroy');
-    Route::patch('/user/{user}/make-admin', [UserController::class, 'makeAdmin'])->name('user.makeAdmin');
-    Route::patch('/user/{user}/remove-admin', [UserController::class, 'removeAdmin'])->name('user.removeAdmin');
+    // ✅ User Routes (khusus untuk admin)
+    Route::middleware('admin')->group(function () {
+        Route::get('/user', [UserController::class, 'index'])->name('user.index');
+        Route::delete('/user/{user}', [UserController::class, 'destroy'])->name('user.destroy');
+        Route::patch('/user/{user}/make-admin', [UserController::class, 'makeAdmin'])->name('user.makeAdmin');
+        Route::patch('/user/{user}/remove-admin', [UserController::class, 'removeAdmin'])->name('user.removeAdmin');
+    });
 });
 
 require __DIR__.'/auth.php';
