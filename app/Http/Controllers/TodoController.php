@@ -4,16 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Todo;
+use App\Models\Category; 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class TodoController extends Controller
 {
-    // ✅ Tampilkan Todo berdasarkan user + hitung completed
+    
     public function index()
     {
         $todos = Todo::where('user_id', auth()->user()->id)
             ->orderBy('is_done', 'asc')
             ->orderBy('created_at', 'desc')
+            ->with('category') 
             ->get();
 
         $todosCompleted = Todo::where('user_id', auth()->user()->id)
@@ -25,69 +28,72 @@ class TodoController extends Controller
 
     public function create()
     {
-        return view('todo.create');
+        $categories = Category::all(); 
+        return view('todo.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required'
+            'title' => 'required|string|max:255',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
-        Todo::create([
+
+       Todo::create([
             'title' => $request->title,
             'user_id' => Auth::id(),
+            'category_id' => $request->category_id ?? null,
             'is_done' => false,
         ]);
 
         return redirect()->route('todo.index')->with('success', 'Todo created successfully!');
     }
 
-    // ✅ Tandai sebagai selesai
     public function markComplete($id)
     {
         $todo = Todo::findOrFail($id);
         $todo->is_done = true;
         $todo->save();
 
-        return redirect()->route('todo.index')->with('success', 'Todo Completed Succesfully!');
+        return redirect()->route('todo.index')->with('success', 'Todo Completed Successfully!');
     }
 
-    // ✅ Tandai sebagai belum selesai
     public function markIncomplete($id)
     {
         $todo = Todo::findOrFail($id);
         $todo->is_done = false;
         $todo->save();
 
-        return redirect()->route('todo.index')->with('success', 'Todo Uncompleted Succesfully!');
+        return redirect()->route('todo.index')->with('success', 'Todo Uncompleted Successfully!');
     }
 
-    // ✅ Edit Todo - hanya jika user yang punya
     public function edit(Todo $todo)
     {
+        $categories = Category::where('user_id', Auth::id())->get();
         if (auth()->user()->id == $todo->user_id) {
-            return view('todo.edit', compact('todo'));
+            $categories = Category::all(); 
+            return view('todo.edit', compact('todo', 'categories'));
         } else {
             return redirect()->route('todo.index')->with('danger', 'You are not authorized to edit this todo!');
         }
     }
 
-    // ✅ Update Todo
     public function update(Request $request, Todo $todo)
     {
         $request->validate([
             'title' => 'required|max:255',
+            'category_id' => 'required|exists:categories,id', 
         ]);
 
         $todo->update([
             'title' => ucwords($request->title),
+            'category_id' => $request->category_id, 
         ]);
 
         return redirect()->route('todo.index')->with('success', 'Todo updated successfully!');
     }
 
-    // ✅ Hapus satu Todo
     public function destroy(Todo $todo)
     {
         if (auth()->user()->id == $todo->user_id) {
@@ -98,7 +104,6 @@ class TodoController extends Controller
         }
     }
 
-    // ✅ Hapus semua todo yang sudah selesai
     public function destroyCompleted()
     {
         $todosCompleted = Todo::where('user_id', auth()->user()->id)

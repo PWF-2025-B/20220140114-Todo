@@ -5,21 +5,17 @@
         </h2>
     </x-slot>
 
-    {{-- Tambahkan mt-4 atau py-8 untuk memberi ruang dari header --}}
     <div class="py-8 mt-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            {{-- Container Card --}}
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
 
-                {{-- Header: Tombol Create di kiri & Notif Success di kanan --}}
                 <div class="flex items-center justify-between px-6 py-4 border-b dark:border-gray-700">
                     <a href="{{ route('todo.create') }}"
                         class="inline-block bg-white text-gray-700 uppercase font-semibold text-sm px-6 py-2 rounded-md shadow-sm hover:bg-gray-100 transition duration-200">
                         Create
                     </a>
 
-                    {{-- Notifikasi sukses --}}
                     @if (session('success'))
                         <div class="text-sm text-green-600 bg-green-100 border border-green-300 rounded px-4 py-2">
                             {{ session('success') }}
@@ -27,12 +23,12 @@
                     @endif
                 </div>
 
-                {{-- Tabel Todo --}}
                 <div class="relative overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th class="px-6 py-3">Title</th>
+                                <th class="px-6 py-3">Category</th>
                                 <th class="px-6 py-3">Status</th>
                                 <th class="px-6 py-3">Action</th>
                             </tr>
@@ -44,6 +40,10 @@
                                         <a href="{{ route('todo.edit', $todo->id) }}" class="hover:underline text-sm">
                                             {{ $todo->title }}
                                         </a>
+                                    </td>
+
+                                    <td class="px-6 py-4">
+                                        {{ $todo->category->title ?? '-' }}
                                     </td>
 
                                     <td class="px-6 py-4">
@@ -91,7 +91,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                                    <td colspan="4" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                         No data available
                                     </td>
                                 </tr>
@@ -100,7 +100,6 @@
                     </table>
                 </div>
 
-                {{-- Footer: Delete All Completed Task --}}
                 @if ($todosCompleted > 1)
                 <div class="px-6 py-4">
                     <form action="{{ route('todo.destroyCompleted') }}" method="POST">

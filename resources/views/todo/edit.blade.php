@@ -12,25 +12,43 @@
                     {{ __("Edit Todo Page") }}
                 </div>
 
-                {{-- ✅ Tambahkan Form Update Todo --}}
+                {{-- ✅ Form Update Todo --}}
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form method="post" action="{{ route('todo.update', $todo) }}" class="">
                         @csrf
                         @method('patch')
 
+                        {{-- Title Field --}}
                         <div class="mb-6">
                             <x-input-label for="title" :value="__('Title')" />
                             <x-text-input id="title" name="title" type="text" class="mt-1 block w-full"
-                                :value="old('name', $todo->title)" required autofocus autocomplete="title" />
+                                :value="old('title', $todo->title)" required autofocus autocomplete="title" />
                             <x-input-error class="mt-2" :messages="$errors->get('title')" />
                         </div>
 
+                        {{-- Category Dropdown --}}
+                        <div class="mb-6">
+                            <x-input-label for="category_id" :value="__('Category')" />
+                            <x-select name="category_id" id="category_id" class="w-full">
+                                <option value="">Empty</option>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}"
+                                        {{ old('category_id', $todo->category_id) == $category->id ? 'selected' : '' }}>
+                                        {{ $category->title }}
+                                    </option>
+                                @endforeach
+                            </x-select>
+                            <x-input-error class="mt-2" :messages="$errors->get('category_id')" />
+                        </div>
+
+                        {{-- Buttons --}}
                         <div class="flex items-center gap-4">
                             <x-primary-button>{{ __('Save') }}</x-primary-button>
                             <x-cancel-button href="{{ route('todo.index') }}" />
                         </div>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>
