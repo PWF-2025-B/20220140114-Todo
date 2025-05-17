@@ -10,20 +10,19 @@ use Illuminate\Validation\Rule;
 
 class TodoController extends Controller
 {
-    
     public function index()
     {
-        $todos = Todo::where('user_id', auth()->user()->id)
+        $todos = Todo::with('category')
+            ->where('user_id', Auth::id())
             ->orderBy('is_done', 'asc')
             ->orderBy('created_at', 'desc')
-            ->with('category') 
-            ->get();
-
-        $todosCompleted = Todo::where('user_id', auth()->user()->id)
+            ->paginate(10);
+        
+        $todoCompleted = Todo::where('user_id', Auth::id())
             ->where('is_done', true)
             ->count();
-
-        return view('todo.index', compact('todos', 'todosCompleted'));
+        
+        return view('todo.index', compact('todos', 'todoCompleted'));
     }
 
     public function create()
@@ -39,8 +38,7 @@ class TodoController extends Controller
             'category_id' => 'nullable|exists:categories,id',
         ]);
 
-
-       Todo::create([
+        Todo::create([
             'title' => $request->title,
             'user_id' => Auth::id(),
             'category_id' => $request->category_id ?? null,
@@ -70,7 +68,6 @@ class TodoController extends Controller
 
     public function edit(Todo $todo)
     {
-        $categories = Category::where('user_id', Auth::id())->get();
         if (auth()->user()->id == $todo->user_id) {
             $categories = Category::all(); 
             return view('todo.edit', compact('todo', 'categories'));

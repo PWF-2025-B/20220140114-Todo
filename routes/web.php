@@ -42,4 +42,9 @@ Route::middleware('auth')->group(function () {
     });
 });
 
+Route::get('/pzn', function (){
+    return "Hello Programmer Zaman Now";
+});
+
 require __DIR__.'/auth.php';
+

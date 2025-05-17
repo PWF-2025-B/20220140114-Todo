@@ -100,7 +100,8 @@
                     </table>
                 </div>
 
-                @if ($todosCompleted > 1)
+                {{-- ✅ Perbaikan variabel disini --}}
+                @if ($todoCompleted > 1)
                 <div class="px-6 py-4">
                     <form action="{{ route('todo.destroyCompleted') }}" method="POST">
                         @csrf
@@ -112,6 +113,11 @@
                     </form>
                 </div>
                 @endif
+
+                {{-- ✅ Tambahkan pagination link --}}
+                <div class="px-6 py-4">
+                    {{ $todos->links() }}
+                </div>
 
             </div>
         </div>
