@@ -24,4 +24,22 @@ class RoutingTest extends TestCase
             ->assertStatus(200)
             ->assertSeeText('Hello Programmer Zaman Now');
     }
+
+    public function testRedirect()
+    {
+        $this->get('/youtube')
+            ->assertRedirect('/pzn');
+    }
+
+    public function testFallback()
+    {
+        $this->get(uri: '/tidakada')
+            ->assertSeeText('404 by Programmer Zaman Now');
+
+        $this->get('/tidakadalagi')
+            ->assertSeeText('404 by Programmer Zaman Now');
+
+        $this->get('/ups')
+            ->assertSeeText('404 by Programmer Zaman Now');
+    }
 }
