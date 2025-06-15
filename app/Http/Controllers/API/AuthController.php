@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -55,11 +56,71 @@ class AuthController extends Controller
     /**
      * Logout user yang sedang login.
      */
+    /**
+     * @OA\Post(
+     *     path="/api/logout",
+     *     summary="Logout user yang sedang login",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Berhasil logout",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status_code", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Logout berhasil. Token telah dihapus.")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized"
+     *     )
+     * )
+     */
     public function logout()
     {
         Auth::guard('api')->logout();
         return response()->json([
-            'message' => 'Logout berhasil',
-        ], 200);
+        'status_code' => 200,
+            'message' => 'Logout berhasil. Token telah dihapus.',
+            ], 200);
+    }
+
+    /**
+     * Logout pengguna yang sedang login.
+     *
+     * Menghapus token JWT agar tidak bisa digunakan lagi.
+     */
+    #[Response(
+    status: 200,
+    content: [
+        'status_code' => 200,
+        'message' => 'Logout berhasil. Token telah dihapus.'
+    ]
+    )]
+    #[Response(
+    status: 500,
+    content: [
+        'status_code' => 500,
+        'message' => 'Gagal logout, terjadi kesalahan.'
+    ]
+    )]
+    public function logoutJwt(Request $request)
+    {
+        try {
+            JWTAuth::invalidate(JWTAuth::getToken());
+
+            return response()->json(
+            [
+                'status_code' => 200,
+                'message' => 'Logout berhasil. Token telah dihapus.'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json(
+            [
+                'status_code' => 500,
+                'message' => 'Gagal logout, terjadi kesalahan '
+            ],
+            500);
+        }
     }
 }

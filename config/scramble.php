@@ -108,4 +108,15 @@ return [
     ],
 
     'extensions' => [],
+    
+    /*
+     * Authentication configuration for the API documentation
+     */
+    'auth' => [
+        'enabled' => true,
+        'in' => 'header',  // Where the token should be placed (header, query, etc.)
+        'name' => 'Authorization', // The name of the header/query parameter
+        'scheme' => 'Bearer', // Auth scheme, such as "Bearer" for JWT
+        'description' => 'Enter your JWT token here',
+    ],
 ];
